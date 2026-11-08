@@ -7,7 +7,7 @@
 | Mini PC, Celeron J1900 | pfSense CE 2.7.2 firewall | 8 GB DDR3L, 32 GB SSD, 4x Intel I226-V |
 | Tenda TEG2205D | Managed 5-port gigabit switch, 802.1Q | Management IP 10.10.10.2 (stays in VLAN 1) |
 | Proxmox VE host | Hypervisor | 16 GB RAM, management IP 10.10.10.3 |
-| Laptop (Linux Mint) | Admin workstation | USB gigabit adapter, static mapping 10.10.10.10 |
+| Laptop | Admin workstation | Static mapping 10.10.10.10 |
 | ISP router | Upstream | double NAT in front of pfSense |
 
 ## pfSense interfaces
