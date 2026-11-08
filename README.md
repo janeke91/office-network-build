@@ -28,9 +28,8 @@ A small-office network built on real hardware: a pfSense firewall, a VLAN-capabl
 
 1. **Default deny.** Nothing is allowed unless a rule says so.
 2. **Zones cannot reach private networks.** INFRA, DMZ and MONITORING each have a *Block any to RFC1918* rule above their internet-access rule. This stops lateral movement and also keeps VMs away from the ISP router and the hypervisor.
-3. **Narrow exceptions above the block.** Only DNS and ICMP to the zone's own gateway, plus (for MONITORING) TCP/9100 from one host to the exporter list.
+3. **Narrow exceptions above the block.** DNS and ICMP to the zone's own gateway; for INFRA also web ports (80/443) and NTP to the internet; for MONITORING, TCP/9100 from one host to the exporter list.
 4. **Management is separate.** The hypervisor lives in its own VLAN. The management network is the only one that can reach it.
-5. **Secrets stay out of this repo** (see `.gitignore`).
 
 ### Access matrix (as built)
 
