@@ -1,4 +1,4 @@
-# Never commit firewall exports or backups (they contain hashes and keys)
+# Firewall exports or backups
 config.xml
 config-*.xml
 *.xml.bak
