@@ -6,7 +6,7 @@ A small-office network built on real hardware: a pfSense firewall, a VLAN-capabl
 
 - Segment a flat network into four security zones using 802.1Q VLANs.
 - Enforce inter-zone policy on a stateful firewall (default deny, narrow exceptions).
-- Monitor every node (hypervisor, VMs, firewall) with Prometheus and Grafana.
+- Monitor the hypervisor, the Linux VMs and the firewall with Prometheus and Grafana.
 - Automate routine administration with Ansible: patching, audit, SSH hardening, backups.
 - Run a Windows domain the way a small company would: OUs, groups, Group Policy, helpdesk delegation, role-based file access.
 - Prove the policy works with documented tests, and record the problems found along the way.
@@ -35,8 +35,8 @@ A small-office network built on real hardware: a pfSense firewall, a VLAN-capabl
 
 | From \ To | MGMT | INFRA | DMZ | MONITORING | Internet |
 |---|---|---|---|---|---|
-| MGMT | n/a | SSH only, from admin PC and ansible | SSH only, from admin PC and ansible | SSH, Grafana, Prometheus (admin PC) | web (80/443), NTP |
-| INFRA | blocked | n/a | blocked | blocked | allowed |
+| MGMT | n/a | SSH from admin PC and ansible; RDP to dc-01 from the same hosts | SSH only, from admin PC and ansible | SSH, Grafana, Prometheus (admin PC) | web (80/443), NTP |
+| INFRA | blocked | n/a | blocked | blocked | web (80/443), NTP |
 | DMZ | blocked | blocked | n/a | blocked | web (80/443), NTP |
 | MONITORING | blocked | 9100 only | 9100 only | n/a | web (80/443), NTP |
 
@@ -57,21 +57,23 @@ All zones may also use the DNS resolver and answer ICMP on their own gateway add
 | [07 Automation](docs/07-automation.md) | Ansible control node, playbooks, design decisions |
 | [08 Active Directory](docs/08-active-directory.md) | Domain corp.lab, OUs, Group Policy, delegation, file share |
 | [Configs](configs/) | Sanitized configuration files |
-| [Screenshots](screenshots/README.md)| Screenshots AKA evidence |
+| [Screenshots](screenshots/README.md) | Evidence: screenshots of rules, tests, monitoring and AD |
+
 ## Tech stack
 
 pfSense CE 2.7.2, Proxmox VE, Debian 13, Windows Server 2022 (Active Directory, DNS, Group Policy), Windows 11, Docker, Prometheus, Grafana, Loki, node_exporter, Ansible, 802.1Q VLANs.
 
-## Future plans
+## Roadmap
 
 - [x] Replace MGMT *pass any* with explicit rules
 - [x] Active Directory (Windows Server, domain `corp.lab`) in INFRA
 - [x] Ansible control VM (`ansible`, MGMT): update and audit playbooks with reports
-- [x] Ansible: hardening (SSH key-only), Lynis score, backup playbooks
+- [x] Ansible: SSH hardening (key-only), audit and backup playbooks
+- [ ] Lynis hardening score
 - [x] Firewall log pipeline: pfSense syslog, Alloy, Loki, Grafana dashboard
-- [x] Backup storage on a separate HDD (pending USB-SATA adapter)
+- [x] Backup storage on a separate HDD
 - [ ] Admin WireGuard remote access into MGMT
 - [ ] Suricata IDS on the DMZ
 - [ ] DMZ service published through a Cloudflare Tunnel
 - [ ] Hybrid cloud connectivity (site-to-site VPN, then BGP)
-- [ ] Alerting system in moniroting
+- [ ] Alerting system in monitoring

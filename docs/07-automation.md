@@ -3,7 +3,7 @@
 ## Design
 
 - **Control node:** `ansible` (10.10.10.20), a small Debian VM in MGMT (VLAN 10). It holds the SSH key that opens every managed host, so it is treated like the hypervisor: it lives only in the management zone.
-- **Firewall:** MGMT rules 4 and 5 use the alias `ADMIN_HOSTS` (admin laptop and `ansible`) as source. Everything else stays unchanged: Ansible reaches the VMs only on TCP/22, like an administrator.
+- **Firewall:** MGMT rules 5 and 6 use the alias `ADMIN_HOSTS` (admin laptop and `ansible`) as source. Everything else stays unchanged: Ansible reaches the VMs only on TCP/22, like an administrator.
 - **Authentication:** SSH key (ed25519) protected by a passphrase, loaded into `ssh-agent` per session. Privilege escalation through `sudo` with the password entered at run time (`--ask-become-pass`). No passwords or keys are stored in this repository.
 - **Inventory:** `ansible/inventory.ini`. Groups are named `*_hosts` to avoid clashing with host names.
 
@@ -13,7 +13,6 @@
 |---|---|
 | `ansible/update.yml` | Refreshes the apt cache, upgrades packages one host at a time (`serial: 1`), compares the running kernel with the newest installed kernel, and prints a one-line report per host (packages upgraded, reboot required or not). Hosts that fail or are unreachable show up as `NO DATA` in the report. |
 | `ansible/harden_ssh.yml` | SSH hardening: drop-in `sshd_config.d/01-hardening.conf` (password and keyboard-interactive login off, root login off). The file is validated with `sshd -t` before it is written, sshd is reloaded (not restarted), hosts are changed one at a time and key-based reachability is checked after each host. |
-
 | `ansible/audit.yml` | Read-only security audit per host: effective sshd settings (root login, password authentication), listening ports compared with a per-host baseline (unexpected and missing ports), pending security updates. Prints `PASS` or `FAIL` with reasons. |
 | `ansible/node_exporter.yml` | Installs and starts `prometheus-node-exporter` on the monitoring VM (idempotent). |
 | `ansible/backup.yml` | Backs up every VM on the Proxmox host with `vzdump` (snapshot mode, zstd) to the external disk. Refuses to run if the disk is not mounted, verifies that every VM has a fresh non-empty archive, and shuts the host down afterwards only when asked (`-e shutdown_after=true`) and only if all backups passed. |
@@ -49,6 +48,8 @@ An audit baseline is a statement of what is expected. Fixing the baseline is onl
 
 ## Planned
 
-- Hardening playbook (SSH key-only login) with before/after audit, and a Lynis score
-- Backup playbook: run `vzdump`, verify the result, copy to a separate disk (pending hardware)
+- Lynis score before and after hardening
 - Run on a schedule after boot, once a restricted `sudo` policy is defined for unattended use
+- Manage the Windows domain controller (WinRM and its own firewall rules)
+
+Screenshots: [Ansible](../screenshots/ansible), [Proxmox backups](../screenshots/proxmox)

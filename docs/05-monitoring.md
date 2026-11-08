@@ -57,3 +57,5 @@ Prometheus keeps 15 days of data in the `prom-data` volume, Loki 7 days in `loki
 
 - pfSense: AutoConfigBackup enabled. The encryption password is stored outside this repo.
 - Proxmox: scheduled VM backups plus a snapshot of each VM before changes.
+
+Screenshots: [Prometheus](../screenshots/prometheus), [Grafana](../screenshots/grafana)

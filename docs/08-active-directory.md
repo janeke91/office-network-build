@@ -73,3 +73,5 @@ Path `C:\Shares\Accounting`, shared as `\\dc-01\Accounting`.
 - **Edited the wrong policy for passwords:** account policy lives in Default Domain Policy, not Default Domain Controllers Policy.
 - **A GPO setting did not apply** until the user logged off and on (User Configuration) or the computer restarted (Computer Configuration). `gpupdate /force` and `gpresult /r` are the first checks.
 - **Moving an OU failed with "Access is denied":** OUs are protected from accidental deletion by default. The computer object had to be moved, not the OU.
+
+Screenshots: [screenshots/active-directory](../screenshots/active-directory)
