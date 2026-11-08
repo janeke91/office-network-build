@@ -1,4 +1,4 @@
-# Enterprise Network Infrastructure
+# Segmented Office Network
 
 A small-office network built on real hardware: a pfSense firewall, a VLAN-capable managed switch and a Proxmox hypervisor. The lab implements zone-based segmentation with least-privilege firewall policy, centralized monitoring and documented verification of every rule. It also includes Ansible automation and an Active Directory domain.
 
