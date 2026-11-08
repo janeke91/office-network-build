@@ -4,7 +4,7 @@
 
 - **Control node:** `ansible` (10.10.10.20), a small Debian VM in MGMT (VLAN 10). It holds the SSH key that opens every managed host, so it is treated like the hypervisor: it lives only in the management zone.
 - **Firewall:** MGMT rules 5 and 6 use the alias `ADMIN_HOSTS` (admin laptop and `ansible`) as source. Everything else stays unchanged: Ansible reaches the VMs only on TCP/22, like an administrator.
-- **Authentication:** SSH key (ed25519) protected by a passphrase, loaded into `ssh-agent` per session. Privilege escalation through `sudo` with the password entered at run time (`--ask-become-pass`). No passwords or keys are stored in this repository.
+- **Authentication:** SSH key (ed25519) protected by a passphrase, loaded into `ssh-agent` per session. Privilege escalation through `sudo` without a password for the `janeke` user on the lab hosts (`/etc/sudoers.d/janeke`). This is acceptable in a lab; in production it would be limited to the commands the playbooks need. No passwords or keys are stored in this repository.
 - **Inventory:** `ansible/inventory.ini`. Groups are named `*_hosts` to avoid clashing with host names.
 
 ## Playbooks
@@ -19,13 +19,11 @@
 
 Run:
 
-```bash
 cd ansible
 eval $(ssh-agent) && ssh-add ~/.ssh/ansible_ed25519
 ansible all -m ping
-ansible-playbook update.yml --check --ask-become-pass   # dry run
-ansible-playbook update.yml --ask-become-pass
-```
+ansible-playbook update.yml --check   # dry run
+ansible-playbook update.yml
 
 ## Design decisions
 

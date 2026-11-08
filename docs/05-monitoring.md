@@ -56,6 +56,5 @@ Prometheus keeps 15 days of data in the `prom-data` volume, Loki 7 days in `loki
 ## Backups
 
 - pfSense: AutoConfigBackup enabled. The encryption password is stored outside this repo.
-- Proxmox: scheduled VM backups plus a snapshot of each VM before changes.
-
+- Proxmox: VM backups are run manually with the Ansible playbook `backup.yml` (vzdump snapshot mode, zstd, to the external disk). The playbook verifies every archive and can shut the host down afterwards. Retention is set on the backup storage (see [screenshots/proxmox](../screenshots/proxmox)).
 Screenshots: [Prometheus](../screenshots/prometheus), [Grafana](../screenshots/grafana)
