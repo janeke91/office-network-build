@@ -11,9 +11,7 @@ A small Windows domain for practicing the identity side of an IT support / junio
 | DNS | AD-integrated DNS on `dc-01`; forwarder to the pfSense resolver `10.10.20.1` |
 | Client | Windows 11 Enterprise (evaluation), joined to the domain, DHCP from pfSense with DNS `10.10.20.5` |
 | Remote access | RDP to `dc-01` only from `ADMIN_HOSTS` (rule on the MGMT interface, see [03](03-firewall-rules.md)) |
-
-The domain name `corp.lab` is used for the lab only. A production design would use a subdomain of a name the company owns (for example `corp.example.com`) and never a made-up suffix or `.local`.
-
+ 
 ## Structure
 
 OUs hold objects and are the target of Group Policy and delegation. Groups hold permissions.
