@@ -84,3 +84,16 @@ Real problems met while building the lab. Each entry: symptom, diagnosis, root c
 - **Method:** test the chain link by link: `tcpdump` on the VM (packets arrive), Alloy logs (parse errors), plain `{job="pfsense"}` query (data stored), then add parsing.
 - **Lesson:** a part of the chain working (data stored) does not mean the query is right. Check what is actually stored before writing filters.
 
+## 13. AdGuard Home blocklist stayed at 0 rules
+
+- **Symptom:** the DNS filter was enabled, but a known ad domain was still resolved ("Processed" in the query log). The blocklist showed 0 rules and no update time.
+- **Cause:** the default upstream was a DNS-over-HTTPS server. To use it AdGuard first has to resolve its hostname through "bootstrap" servers over plain DNS (port 53) on the internet, and the DMZ firewall allows DNS only to the gateway. The lookups timed out, so the list URL could not be resolved either (logs: `i/o timeout` to the bootstrap addresses).
+- **Fix:** set the upstream to the pfSense address of the zone (`10.10.30.1`), then *Filters > DNS blocklists > Check for updates*. The list loaded (about 190,000 rules).
+- **Lesson:** a service that resolves names itself needs a DNS path that the zone firewall allows. Read the application log (`journalctl -u AdGuardHome`) before changing rules.
+
+## 14. Proxmox backup storage unavailable after unplugging the USB disk
+
+- **Symptom:** the storage `back-up-HDD` showed a question mark; the error was `failed to create content directory '/mnt/backup/dump' - Operation not permitted`.
+- **Cause:** the USB disk was disconnected while mounted. The mount point is protected against writes when nothing is mounted, so Proxmox could not create the directory.
+- **Fix:** reconnect the disk, check `lsblk -f` and `dmesg`, mount it (`mount /mnt/backup`), verify the old backups with `ls /mnt/backup/dump` and the storage state with `pvesm status`.
+- **Lesson:** unmount (`umount /mnt/backup`) or shut the host down before removing a disk, and do not run `backup.yml` until `findmnt /mnt/backup` shows the disk.

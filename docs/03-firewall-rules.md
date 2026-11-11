@@ -24,24 +24,27 @@ For each restricted zone the order is: narrow *pass* exceptions, then a logged *
 
 ## MGMT (VLAN 10)
 
-Admin workstation: 10.10.10.10 (static DHCP mapping). Ansible control node `ansible`: 10.10.10.20. Proxmox: 10.10.10.3. Rules 1, 5 and 6 use the alias `ADMIN_HOSTS`, so Ansible reaches the VMs on TCP/22 only, like an administrator. Every exception sits above the block rule (8): a pass rule for a private address placed below it would never match.
+Admin workstation: 10.10.10.10 (static mapping). Ansible control node `ansible`: 10.10.10.20. VPN node `tailscale-vpn`: 10.10.10.30. Proxmox: 10.10.10.3. Rules 2, 6 and 7 use the alias `ADMIN_HOSTS`, so Ansible reaches the VMs on TCP/22 only, like an administrator. Every exception sits above the block rule (9): a pass rule for a private address placed below it would never match.
 
 | # | Action | Proto | Source | Destination | Port | Note |
 |---|---|---|---|---|---|---|
-| 1 | Pass | TCP | ADMIN_HOSTS | 10.10.20.5 | 3389 | RDP to dc-01 |
-| 2 | Pass | TCP | 10.10.10.10 | MGMT address | 443 | pfSense admin GUI |
-| 3 | Pass | TCP/UDP | MGMT subnet | MGMT address | 53 | DNS |
-| 4 | Pass | ICMP | MGMT subnet | MGMT address | n/a | Gateway ping |
-| 5 | Pass | TCP | ADMIN_HOSTS | 10.10.10.3 | proxmox_ports (22, 8006) | Proxmox GUI and SSH |
-| 6 | Pass | TCP | ADMIN_HOSTS | SSH_TARGETS | 22 | SSH to VMs |
-| 7 | Pass | TCP | 10.10.10.10 | 10.10.40.10 | monitoring_ports (3000, 9090) | Grafana, Prometheus |
-| 8 | Block (log) | any | MGMT subnet | RFC1918 | any | "block internal networks" |
-| 9 | Pass | TCP | MGMT subnet | any | web_ports | Updates |
-| 10 | Pass | UDP | MGMT subnet | any | 123 | NTP |
+| 1 | Pass | TCP | 10.10.10.30 | MGMT address | 443 | pfSense admin GUI from the VPN node |
+| 2 | Pass | TCP | ADMIN_HOSTS | 10.10.20.5 | 3389 | RDP to dc-01 |
+| 3 | Pass | TCP | 10.10.10.10 | MGMT address | 443 | pfSense admin GUI |
+| 4 | Pass | TCP/UDP | MGMT subnet | MGMT address | 53 | DNS |
+| 5 | Pass | ICMP | MGMT subnet | MGMT address | n/a | Gateway ping |
+| 6 | Pass | TCP | ADMIN_HOSTS | 10.10.10.3 | proxmox_ports (22, 8006) | Proxmox GUI and SSH |
+| 7 | Pass | TCP | ADMIN_HOSTS | SSH_TARGETS | 22 | SSH to VMs |
+| 8 | Pass | TCP | 10.10.10.10 | 10.10.40.10 | monitoring_ports (3000, 9090) | Grafana, Prometheus |
+| 9 | Block (log) | any | MGMT subnet | RFC1918 | any | "block internal networks" |
+| 10 | Pass | TCP | MGMT subnet | any | web_ports | Updates, Tailscale control and relay traffic |
+| 11 | Pass | UDP | MGMT subnet | any | 123 | NTP |
 
-The former temporary *pass any* rule was removed. pfSense's built-in anti-lockout rule only covers the LAN interface, which no longer has an address, so rule 2 is what keeps the GUI reachable: keep it above the block rule and keep a config backup and console access before editing MGMT rules.
+The former temporary *pass any* rule was removed. pfSense's built-in anti-lockout rule only covers the LAN interface, which no longer has an address, so rule 3 is what keeps the GUI reachable from the admin laptop: keep it above the block rule and keep a config backup and console access before editing MGMT rules.
 
-Additional aliases: `SSH_TARGETS` (10.10.20.10, 10.10.30.10, 10.10.40.10), `proxmox_ports` (22, 8006), `monitoring_ports` (3000, 9090).
+Rule 1 exists because the VPN node reaches pfSense itself. Proxmox and other hosts in 10.10.10.0/24 are in the same subnet as the VPN node, so that traffic does not pass through pfSense and needs no rule.
+
+Additional aliases: `SSH_TARGETS` (10.10.20.10, 10.10.30.10, 10.10.30.20, 10.10.40.10), `proxmox_ports` (22, 8006), `monitoring_ports` (3000, 9090).
 
 Note: in a pfSense rule, `22 - 8006` is a *range* of about 8000 ports. Use a port alias for a list.
 
@@ -66,6 +69,8 @@ Earlier versions had *pass any* as rule 4. It was narrowed so a VM can only reac
 | 3 | Block (log) | any | DMZ subnet | RFC1918 | any | |
 | 4 | Pass | TCP | DMZ subnet | any | web_ports | HTTP/HTTPS only |
 | 5 | Pass | UDP | DMZ subnet | any | 123 | NTP |
+
+The VPN exit node `exit-node-vpn` (10.10.30.20) uses these rules without exceptions. Tailscale connects out over TCP 443, and a DNS filter (AdGuard Home) on the same VM uses pfSense (10.10.30.1) as its upstream, because DMZ allows DNS only to the gateway. Traffic of remote users that leaves through the node is subject to rule 3, so it cannot reach any private network.
 
 Planned: TCP/UDP 7844 outbound for `cloudflared`.
 

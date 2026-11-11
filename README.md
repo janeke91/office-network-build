@@ -21,7 +21,7 @@ A small-office network built on real hardware: a pfSense firewall, a VLAN-capabl
 |---|---|---|---|---|
 | MGMT | 10 | 10.10.10.0/24 | 10.10.10.1 | Administration: hypervisor, switch, admin workstation |
 | INFRA | 20 | 10.10.20.0/24 | 10.10.20.1 | Internal servers |
-| DMZ | 30 | 10.10.30.0/24 | 10.10.30.1 | Internet-facing services |
+| DMZ | 30 | 10.10.30.0/24 | 10.10.30.1 | Internet-facing services, VPN exit node |
 | MONITORING | 40 | 10.10.40.0/24 | 10.10.40.1 | Metrics collection and dashboards |
 
 ## Security model
@@ -72,7 +72,8 @@ pfSense CE 2.7.2, Proxmox VE, Debian 13, Windows Server 2022 (Active Directory, 
 - [ ] Lynis hardening score
 - [x] Firewall log pipeline: pfSense syslog, Alloy, Loki, Grafana dashboard
 - [x] Backup storage on a separate HDD
-- [ ] Admin WireGuard remote access into MGMT
+- [x] Admin remote access into MGMT (Tailscale subnet router)
+- [x] VPN exit node in DMZ with DNS ad filtering (AdGuard Home) and a restrictive Tailscale access policy
 - [ ] Suricata IDS on the DMZ
 - [ ] DMZ service published through a Cloudflare Tunnel
 - [ ] Hybrid cloud connectivity (site-to-site VPN, then BGP)

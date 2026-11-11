@@ -22,6 +22,10 @@ Every rule is tested from the zone it applies to. Results are from the built lab
 | 16 | Laptop (MGMT) | `ping 10.10.20.10` while SSH works | No reply, SSH ok | Pass |
 | 17 | Laptop (MGMT) | `ping 1.1.1.1` | No reply (no ICMP rule to internet) | Pass |
 | 18 | All | Reboot pfSense, then Proxmox | MGMT, VMs and Grafana return without manual action | Pass |
+| 19 | Phone on mobile data | Tailscale on, open `https://10.10.10.3:8006` and `https://10.10.10.1` | Both open | Pass |
+| 20 | Phone on mobile data | Tailscale on, `exit-node-vpn` selected, open an "IP address" website | Home ISP address instead of the mobile operator's | Pass |
+| 21 | exit-node-vpn | `dig @127.0.0.1 doubleclick.net +short` | Blocked (query log: "Blocked", AdGuard DNS filter) | Pass |
+| 22 | Tailscale access policy | Policy `tests`: restricted user to Proxmox, pfSense GUI, VPN node, AdGuard panel | Denied; DNS (53) on the exit node allowed | Pass |
 
 ## Useful commands
 

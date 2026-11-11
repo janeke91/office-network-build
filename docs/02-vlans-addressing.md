@@ -16,10 +16,12 @@
 | pfSense | MGMT | 10.10.10.1 |
 | Tenda switch | VLAN 1 | 10.10.10.2 |
 | Proxmox host | MGMT | 10.10.10.3 |
-| Admin laptop | MGMT | 10.10.10.10 (DHCP static mapping) |
-| ansible (VM 103) | MGMT | 10.10.10.20 (DHCP static mapping) |
+| Admin laptop | MGMT | 10.10.10.10 (static mapping) |
+| ansible (VM 103) | MGMT | 10.10.10.20 (static mapping) |
+| tailscale-vpn (VM 106) | MGMT | 10.10.10.30 (static, set in the VM) |
 | test-infra (VM 100) | INFRA | 10.10.20.10 |
 | dmz (VM 101) | DMZ | 10.10.30.10 |
+| exit-node-vpn (VM 107) | DMZ | 10.10.30.20 (static, set in the VM) |
 | monitoring (VM 102) | MONITORING | 10.10.40.10 |
 
 The MGMT DHCP server uses "allow known clients from only this interface", so unknown devices do not receive a lease.

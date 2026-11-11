@@ -39,3 +39,19 @@ Proxmox uses a VLAN-aware bridge. Each VM NIC gets a VLAN tag in its Proxmox har
 ## Upstream network
 
 pfSense sits behind the ISP router (double NAT). Outbound access is unaffected. Inbound publishing is not planned through port forwarding: external access to DMZ services is intended to use an outbound-only Cloudflare Tunnel.
+
+## Remote access
+
+The VM `tailscale-vpn` (10.10.10.30, MGMT) is a Tailscale subnet router. It advertises only `10.10.10.0/24`, so a remote laptop or phone reaches MGMT hosts as if it were on the cable. No port is forwarded: the VM connects out to Tailscale, and the double NAT in front of pfSense does not matter.
+
+- Remote traffic leaves the VM with its own address as source (10.10.10.30), so rule 1 in MGMT is needed to open the pfSense GUI. Other zones are not advertised and stay unreachable from the VPN.
+- Login uses an external identity account with two-factor authentication. Key expiry is disabled for the node so the route does not drop silently.
+- Client devices use `tailscale up --accept-routes` (Linux) or the app on a phone.
+
+### Exit node and DNS filter for remote users
+
+A second Tailscale node, `exit-node-vpn` (10.10.30.20, DMZ), is an exit node: remote devices can send all internet traffic through the home connection. It runs AdGuard Home (blocklist: AdGuard DNS filter), and the Tailscale admin console points the tailnet DNS at it, so remote devices get ad and tracker blocking.
+
+- The node sits in DMZ on purpose: the DMZ rules block every private network, so traffic of other people cannot reach MGMT or INFRA even if a device is compromised.
+- The node has the tag `tag:exit`. The Tailscale access policy gives a restricted user group only DNS (port 53) on that tag and the internet; the admin group has full access. The policy contains `tests` that fail the save if a restricted user could reach Proxmox, the pfSense GUI or the VPN node.
+- Limits: DNS filtering does not remove ads served from the same domain as the content (for example YouTube video ads), and all traffic leaves with the home IP address.
