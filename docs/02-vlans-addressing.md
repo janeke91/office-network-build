@@ -20,7 +20,7 @@
 | ansible (VM 103) | MGMT | 10.10.10.20 (static mapping) |
 | tailscale-vpn (VM 106) | MGMT | 10.10.10.30 (static, set in the VM) |
 | homepage (VM 108) | MGMT | 10.10.10.40 (static, set in the VM) |
-| dc-01 | INFRA | 10.10.20.5 |
+| dc-01 (VM 104) | INFRA | 10.10.20.5 |
 | exit-node-vpn (VM 107) | DMZ | 10.10.30.20 (static, set in the VM) |
 | monitoring (VM 102) | MONITORING | 10.10.40.10 |
 
