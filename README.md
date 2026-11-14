@@ -78,4 +78,4 @@ pfSense CE 2.7.2, Proxmox VE, Debian 13, Windows Server 2022 (Active Directory, 
 - [ ] Suricata IDS on the DMZ
 - [ ] DMZ service published through a Cloudflare Tunnel
 - [ ] Hybrid cloud connectivity (site-to-site VPN, then BGP)
-- [ ] Alerting system in monitoring
+- [x] Alerting in monitoring (Grafana rules to Telegram: target down, disk, Proxmox temperature)

@@ -97,3 +97,10 @@ Real problems met while building the lab. Each entry: symptom, diagnosis, root c
 - **Cause:** the USB disk was disconnected while mounted. The mount point is protected against writes when nothing is mounted, so Proxmox could not create the directory.
 - **Fix:** reconnect the disk, check `lsblk -f` and `dmesg`, mount it (`mount /mnt/backup`), verify the old backups with `ls /mnt/backup/dump` and the storage state with `pvesm status`.
 - **Lesson:** unmount (`umount /mnt/backup`) or shut the host down before removing a disk, and do not run `backup.yml` until `findmnt /mnt/backup` shows the disk.
+
+## 15. Grafana could not send Telegram messages (DNS "server misbehaving")
+
+- **Symptom:** the contact point test failed with `lookup api.telegram.org on 127.0.0.11:53: server misbehaving`.
+- **Cause:** a container on a Compose network resolves names through Docker's embedded DNS (127.0.0.11), which forwards to the DNS of the host. This forwarding did not work from the monitoring VM, although the VM itself resolved names fine (`getent hosts api.telegram.org` worked). The MONITORING firewall rules already allowed DNS to the gateway.
+- **Fix:** give the Grafana service its own DNS server in `compose.yaml` (`dns: - 10.10.40.1`, the pfSense address of the zone) and recreate the container (`docker compose up -d`). The test message arrived.
+- **Lesson:** test name resolution from inside the container (not only from the host) and check which resolver the container actually uses.

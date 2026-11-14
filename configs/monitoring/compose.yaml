@@ -13,6 +13,8 @@ services:
 
   grafana:
     image: grafana/grafana
+    dns:
+      - 10.10.40.1
     volumes:
       - grafana-data:/var/lib/grafana
     ports:

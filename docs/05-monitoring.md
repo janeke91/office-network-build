@@ -57,6 +57,21 @@ The VM `homepage` (VM 108, 10.10.10.40, MGMT) runs [Homepage](https://gethomepag
 - No secrets are needed: the widgets read Prometheus without credentials. A Proxmox API token or a Tailscale API key would be kept in an untracked `.env` file (see `.gitignore`).
 - The wallpaper and personal bookmarks are not stored in the repository.
 
+## Alerting (Grafana to Telegram)
+
+Grafana-managed alerts send notifications to a Telegram bot. The bot token and chat ID are entered in the Grafana contact point (stored in the `grafana-data` volume) and are not part of this repository.
+
+| Rule | Condition | Pending |
+|---|---|---|
+| Target down | `up < 1` (any scrape target) | 2 min |
+| Disk almost full | filesystem usage above 85% (tmpfs, overlay and squashfs excluded) | 5 min |
+| Proxmox temperature | `node_hwmon_temp_celsius` of the Proxmox host above 80 C | 5 min |
+
+- Rules live in one folder and one evaluation group (every 1 minute). The *Pending* period avoids messages for short glitches.
+- The default notification policy sends everything to the `telegram` contact point. The message text is set in the contact point (a short English format: ALERT or RESOLVED, rule name, host, summary) instead of the long default template.
+- Tested by stopping `prometheus-node-exporter` on the monitoring VM: the ALERT message arrived after about 3 minutes and the RESOLVED message after starting the service again.
+- Grafana needs a DNS server that works from inside the container, see [troubleshooting 15](06-troubleshooting.md).
+
 ## Retention and persistence
 
 Prometheus keeps 15 days of data in the `prom-data` volume, Loki 7 days in `loki-data`. Grafana state lives in `grafana-data`. Both containers use `restart: unless-stopped`.
