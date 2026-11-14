@@ -61,6 +61,6 @@
         siteMonitor: http://10.10.40.10:9090
     - Tailscale:
         icon: tailscale.png
-        description: Remote access · 100.68.43.11
+        description: Remote access
         href: https://login.tailscale.com/admin/machines
         siteMonitor: https://login.tailscale.com
