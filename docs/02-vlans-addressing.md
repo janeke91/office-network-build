@@ -19,10 +19,12 @@
 | Admin laptop | MGMT | 10.10.10.10 (static mapping) |
 | ansible (VM 103) | MGMT | 10.10.10.20 (static mapping) |
 | tailscale-vpn (VM 106) | MGMT | 10.10.10.30 (static, set in the VM) |
-| test-infra (VM 100) | INFRA | 10.10.20.10 |
-| dmz (VM 101) | DMZ | 10.10.30.10 |
+| homepage (VM 108) | MGMT | 10.10.10.40 (static, set in the VM) |
+| dc-01 | INFRA | 10.10.20.5 |
 | exit-node-vpn (VM 107) | DMZ | 10.10.30.20 (static, set in the VM) |
 | monitoring (VM 102) | MONITORING | 10.10.40.10 |
+
+The INFRA test VM (`test-infra`, VM 100) and the DMZ test VM (`dmz`, VM 101) used for the first rule tests were removed afterwards to free resources. INFRA is represented by the domain controller and the Windows client, DMZ by the exit node.
 
 The MGMT DHCP server uses "allow known clients from only this interface", so unknown devices do not receive a lease.
 
@@ -34,7 +36,7 @@ Key points:
 
 - `vmbr0` is VLAN-aware and carries VLANs 10, 20, 30, 40 on the physical port `nic0`.
 - The host address is on **`vmbr0.10`**, not on `vmbr0`. An address on `vmbr0` itself would send untagged frames, which the switch trunk places into VLAN 1.
-- VM NICs use VirtIO on `vmbr0` with the VLAN tag set per VM (20, 30, 40).
+- VM NICs use VirtIO on `vmbr0` with the VLAN tag set per VM (10, 20, 30, 40).
 - All VMs are set to start at boot.
 
 ## Design note: why the switch management stays in VLAN 1

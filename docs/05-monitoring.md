@@ -7,8 +7,6 @@ Prometheus (pull model) runs in Docker on the `monitoring` VM (10.10.40.10, VLAN
 | Job | Target | Label |
 |---|---|---|
 | proxmox | 10.10.10.3:9100 | |
-| vms | 10.10.20.10:9100 | test-infra |
-| vms | 10.10.30.10:9100 | dmz |
 | vms | 10.10.40.10:9100 | monitoring |
 | pfsense | 10.10.40.1:9100 | pfsense |
 
@@ -48,6 +46,16 @@ pfSense (remote syslog, UDP 1514, RFC 5424) -> Alloy -> Loki -> Grafana
 - Grafana: Loki data source `http://loki:3100`. Dashboard: [pfsense-firewall-logs.json](../configs/monitoring/dashboards/pfsense-firewall-logs.json) (import it and pick the Loki data source).
 - Alloy keeps only the message body, so a `filterlog` line starts with the rule number. The dashboard parses the CSV fields (`rule`, `tracker`, `iface`, `action`, `src`, `dst`, `proto`, `sport`, `dport`) with a LogQL `regexp` stage.
 - Interfaces map to zones: `igc1.10` MGMT, `igc1.20` INFRA, `igc1.30` DMZ, `igc1.40` MONITORING, `igc0` WAN. WAN default-deny noise (broadcasts from the home network) is shown separately so it does not hide the zone blocks.
+
+## Homepage dashboard
+
+The VM `homepage` (VM 108, 10.10.10.40, MGMT) runs [Homepage](https://gethomepage.dev) in Docker as a single start page for the lab: one tile per service with a status indicator, and the Proxmox host metrics taken from Prometheus (temperature, CPU, RAM, root disk). Files: [configs/homepage](../configs/homepage).
+
+- Status indicators (`siteMonitor`) are checked by the container itself, so MGMT has three narrow rules for it (rules 1 to 3 in [03 Firewall rules](03-firewall-rules.md)). A tile link is opened by the visitor's browser, not by the VM.
+- Metrics use the `prometheusmetric` widget with PromQL queries against `http://10.10.40.10:9090`. The Proxmox temperature comes from `node_hwmon_temp_celsius` (lm-sensors on the host, exposed by node_exporter).
+- The pfSense box (J1900) exposes no temperature sensor, so only the Proxmox host shows temperature.
+- No secrets are needed: the widgets read Prometheus without credentials. A Proxmox API token or a Tailscale API key would be kept in an untracked `.env` file (see `.gitignore`).
+- The wallpaper and personal bookmarks are not stored in the repository.
 
 ## Retention and persistence
 

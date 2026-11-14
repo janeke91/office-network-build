@@ -74,6 +74,7 @@ pfSense CE 2.7.2, Proxmox VE, Debian 13, Windows Server 2022 (Active Directory, 
 - [x] Backup storage on a separate HDD
 - [x] Admin remote access into MGMT (Tailscale subnet router)
 - [x] VPN exit node in DMZ with DNS ad filtering (AdGuard Home) and a restrictive Tailscale access policy
+- [x] Homepage dashboard (service status and Proxmox metrics from Prometheus)
 - [ ] Suricata IDS on the DMZ
 - [ ] DMZ service published through a Cloudflare Tunnel
 - [ ] Hybrid cloud connectivity (site-to-site VPN, then BGP)

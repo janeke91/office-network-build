@@ -1,0 +1,14 @@
+- search:
+    provider: duckduckgo
+    target: _blank
+- datetime:
+    text_size: xl
+    format:
+      timeStyle: short
+      dateStyle: short
+- openmeteo:
+    label: Atyrau
+    latitude: 47.11
+    longitude: 51.92
+    units: metric
+    cache: 5

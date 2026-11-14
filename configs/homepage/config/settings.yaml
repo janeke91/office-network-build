@@ -1,0 +1,18 @@
+title: Homelab
+theme: dark
+color: slate
+hideVersion: true
+headerStyle: clean
+cardBlur: md
+useEqualHeights: true
+maxGroupColumns: 2
+background:
+  image: /images/mountain.jpg
+  opacity: 40
+layout:
+  Hypervisor:
+    style: row
+    columns: 1
+  Services:
+    style: row
+    columns: 2

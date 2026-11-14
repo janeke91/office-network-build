@@ -42,11 +42,15 @@ pfSense sits behind the ISP router (double NAT). Outbound access is unaffected. 
 
 ## Remote access
 
-The VM `tailscale-vpn` (10.10.10.30, MGMT) is a Tailscale subnet router. It advertises only `10.10.10.0/24`, so a remote laptop or phone reaches MGMT hosts as if it were on the cable. No port is forwarded: the VM connects out to Tailscale, and the double NAT in front of pfSense does not matter.
+The VM `tailscale-vpn` (10.10.10.30, MGMT) is a Tailscale subnet router. It advertises `10.10.10.0/24` and one extra host route, `10.10.40.10/32` (Grafana and Prometheus), so a remote laptop or phone reaches MGMT hosts and the monitoring host as if it were on the cable. The route is a single host on purpose: the rest of the MONITORING zone stays unreachable from the VPN. No port is forwarded: the VM connects out to Tailscale, and the double NAT in front of pfSense does not matter.
 
-- Remote traffic leaves the VM with its own address as source (10.10.10.30), so rule 1 in MGMT is needed to open the pfSense GUI. Other zones are not advertised and stay unreachable from the VPN.
+- Remote traffic leaves the VM with its own address as source (10.10.10.30), so rules 1 and 2 in MGMT are needed to open Grafana, Prometheus and the pfSense GUI. Other zones are not advertised and stay unreachable from the VPN.
 - Login uses an external identity account with two-factor authentication. Key expiry is disabled for the node so the route does not drop silently.
 - Client devices use `tailscale up --accept-routes` (Linux) or the app on a phone.
+
+### Dashboard
+
+The VM `homepage` (10.10.10.40, MGMT) shows the state of the lab on one page; see [05 Monitoring](05-monitoring.md).
 
 ### Exit node and DNS filter for remote users
 

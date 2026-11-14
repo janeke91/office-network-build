@@ -8,12 +8,6 @@ scrape_configs:
 
   - job_name: vms
     static_configs:
-      - targets: ["10.10.20.10:9100"]
-        labels:
-          name: test-infra
-      - targets: ["10.10.30.10:9100"]
-        labels:
-          name: dmz
       - targets: ["10.10.40.10:9100"]
         labels:
           name: monitoring

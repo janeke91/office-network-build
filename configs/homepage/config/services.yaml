@@ -1,0 +1,66 @@
+- Hypervisor:
+    - Proxmox:
+        icon: proxmox.png
+        description: Hypervisor · 10.10.10.3
+        href: https://10.10.10.3:8006
+        siteMonitor: https://10.10.10.3:8006
+        widget:
+          type: prometheusmetric
+          url: http://10.10.40.10:9090
+          refreshInterval: 15000
+          metrics:
+            - label: Temp
+              query: max(node_hwmon_temp_celsius{instance="10.10.10.3:9100"})
+              format:
+                type: number
+                suffix: " °C"
+                options:
+                  maximumFractionDigits: 0
+            - label: CPU
+              query: 100 - avg(rate(node_cpu_seconds_total{mode="idle",instance="10.10.10.3:9100"}[2m])) * 100
+              format:
+                type: number
+                suffix: " %"
+                options:
+                  maximumFractionDigits: 0
+            - label: RAM
+              query: (1 - node_memory_MemAvailable_bytes{instance="10.10.10.3:9100"} / node_memory_MemTotal_bytes{instance="10.10.10.3:9100"}) * 100
+              format:
+                type: number
+                suffix: " %"
+                options:
+                  maximumFractionDigits: 0
+            - label: Disk
+              query: (1 - node_filesystem_avail_bytes{instance="10.10.10.3:9100",mountpoint="/"} / node_filesystem_size_bytes{instance="10.10.10.3:9100",mountpoint="/"}) * 100
+              format:
+                type: number
+                suffix: " %"
+                options:
+                  maximumFractionDigits: 0
+
+- Services:
+    - pfSense:
+        icon: pfsense.png
+        description: Firewall · 10.10.10.1
+        href: https://10.10.10.1
+        siteMonitor: https://10.10.10.1
+    - AdGuard:
+        icon: adguard-home.png
+        description: DNS filter · 10.10.30.20
+        href: http://10.10.30.20
+        siteMonitor: http://10.10.30.20
+    - Grafana:
+        icon: grafana.png
+        description: Dashboards · 10.10.40.10
+        href: http://10.10.40.10:3000
+        siteMonitor: http://10.10.40.10:3000
+    - Prometheus:
+        icon: prometheus.png
+        description: Metrics · 10.10.40.10
+        href: http://10.10.40.10:9090
+        siteMonitor: http://10.10.40.10:9090
+    - Tailscale:
+        icon: tailscale.png
+        description: Remote access · 100.68.43.11
+        href: https://login.tailscale.com/admin/machines
+        siteMonitor: https://login.tailscale.com

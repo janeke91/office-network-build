@@ -22,3 +22,7 @@ screenshots/raw/
 # Editor / OS
 .DS_Store
 *.swp
+
+# Homepage: wallpaper and personal bookmarks
+configs/homepage/images/
+configs/homepage/config/bookmarks.yaml

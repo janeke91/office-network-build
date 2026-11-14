@@ -1,0 +1,12 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest   # pin a version tag for production
+    container_name: homepage
+    ports:
+      - "8080:3000"
+    volumes:
+      - ./config:/app/config
+      - ./images:/app/public/images   # wallpaper, not stored in this repository
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "10.10.10.40:8080"
+    restart: unless-stopped
