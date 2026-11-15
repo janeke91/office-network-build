@@ -29,7 +29,7 @@ Admin workstation: 10.10.10.10 (static mapping). Ansible control node `ansible`:
 | # | Action | Proto | Source | Destination | Port | Note |
 |---|---|---|---|---|---|---|
 | 1 | Pass | TCP | 10.10.10.40 | 10.10.10.1 | 443 | Homepage status check of the pfSense GUI |
-| 2 | Pass | TCP | 10.10.10.40 | 10.10.30.20 | 80 | Homepage status check of AdGuard Home |
+| 2 | Pass | TCP | 10.10.10.40 | 10.10.30.20 | 80 | Homepage status check of Pi-hole |
 | 3 | Pass | TCP | 10.10.10.40 | 10.10.40.10 | monitoring_ports (3000, 9090) | Homepage status checks and Prometheus metrics |
 | 4 | Pass | TCP | 10.10.10.30 | 10.10.40.10 | monitoring_ports (3000, 9090) | Grafana and Prometheus from the VPN node |
 | 5 | Pass | TCP | 10.10.10.30 | MGMT address | 443 | pfSense admin GUI from the VPN node |
@@ -76,7 +76,7 @@ Earlier versions had *pass any* as rule 4. It was narrowed so a VM can only reac
 | 4 | Pass | TCP | DMZ subnet | any | web_ports | HTTP/HTTPS only |
 | 5 | Pass | UDP | DMZ subnet | any | 123 | NTP |
 
-The VPN exit node `exit-node-vpn` (10.10.30.20) uses these rules without exceptions. Tailscale connects out over TCP 443, and a DNS filter (AdGuard Home) on the same VM uses pfSense (10.10.30.1) as its upstream, because DMZ allows DNS only to the gateway. Traffic of remote users that leaves through the node is subject to rule 3, so it cannot reach any private network.
+The VPN exit node `exit-node-vpn` (10.10.30.20) uses these rules without exceptions. Tailscale connects out over TCP 443, and a DNS filter (Pi-hole) on the same VM uses pfSense (10.10.30.1) as its upstream, because DMZ allows DNS only to the gateway. Traffic of remote users that leaves through the node is subject to rule 3, so it cannot reach any private network.
 
 Planned: TCP/UDP 7844 outbound for `cloudflared`.
 

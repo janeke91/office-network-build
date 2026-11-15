@@ -24,10 +24,11 @@ Every rule is tested from the zone it applies to. Results are from the built lab
 | 18 | All | Reboot pfSense, then Proxmox | MGMT, VMs and Grafana return without manual action | Pass |
 | 19 | Phone on mobile data | Tailscale on, open `https://10.10.10.3:8006` and `https://10.10.10.1` | Both open | Pass |
 | 20 | Phone on mobile data | Tailscale on, `exit-node-vpn` selected, open an "IP address" website | Home ISP address instead of the mobile operator's | Pass |
-| 21 | exit-node-vpn | `dig @127.0.0.1 doubleclick.net +short` | Blocked (query log: "Blocked", AdGuard DNS filter) | Pass |
-| 22 | Tailscale access policy | Policy `tests`: restricted user to Proxmox, pfSense GUI, VPN node, AdGuard panel | Denied; DNS (53) on the exit node allowed | Pass |
+| 21 | exit-node-vpn | `dig @127.0.0.1 doubleclick.net +short` | Blocked (answer `0.0.0.0`; query log: "Blocked", Pi-hole) | Pass |
+| 22 | Tailscale access policy | Policy `tests`: restricted user to Proxmox, pfSense GUI, VPN node, Pi-hole panel | Denied; DNS (53) on the exit node allowed | Pass |
 | 23 | Phone or laptop on Tailscale | Open `http://10.10.40.10:3000` (Grafana) and `:9090` (Prometheus) | Both open | Pass |
-| 24 | homepage (MGMT) | Dashboard status indicators for pfSense GUI, AdGuard Home, Grafana, Prometheus; Proxmox widget values from Prometheus | All indicators green, metrics shown | Pass |
+| 24 | homepage (MGMT) | Dashboard status indicators for pfSense GUI, Pi-hole, Grafana, Prometheus; Proxmox widget values from Prometheus | All indicators green, metrics shown | Pass |
+| 25 | Laptop on Tailscale | `exit-node-vpn` selected, `nslookup doubleclick.net` | `0.0.0.0`; the laptop shows up in the Pi-hole query log | Pass |
 
 ## Useful commands
 

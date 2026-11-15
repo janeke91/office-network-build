@@ -84,23 +84,28 @@ Real problems met while building the lab. Each entry: symptom, diagnosis, root c
 - **Method:** test the chain link by link: `tcpdump` on the VM (packets arrive), Alloy logs (parse errors), plain `{job="pfsense"}` query (data stored), then add parsing.
 - **Lesson:** a part of the chain working (data stored) does not mean the query is right. Check what is actually stored before writing filters.
 
-## 13. AdGuard Home blocklist stayed at 0 rules
-
-- **Symptom:** the DNS filter was enabled, but a known ad domain was still resolved ("Processed" in the query log). The blocklist showed 0 rules and no update time.
-- **Cause:** the default upstream was a DNS-over-HTTPS server. To use it AdGuard first has to resolve its hostname through "bootstrap" servers over plain DNS (port 53) on the internet, and the DMZ firewall allows DNS only to the gateway. The lookups timed out, so the list URL could not be resolved either (logs: `i/o timeout` to the bootstrap addresses).
-- **Fix:** set the upstream to the pfSense address of the zone (`10.10.30.1`), then *Filters > DNS blocklists > Check for updates*. The list loaded (about 190,000 rules).
-- **Lesson:** a service that resolves names itself needs a DNS path that the zone firewall allows. Read the application log (`journalctl -u AdGuardHome`) before changing rules.
-
-## 14. Proxmox backup storage unavailable after unplugging the USB disk
+## 13. Proxmox backup storage unavailable after unplugging the USB disk
 
 - **Symptom:** the storage `back-up-HDD` showed a question mark; the error was `failed to create content directory '/mnt/backup/dump' - Operation not permitted`.
 - **Cause:** the USB disk was disconnected while mounted. The mount point is protected against writes when nothing is mounted, so Proxmox could not create the directory.
 - **Fix:** reconnect the disk, check `lsblk -f` and `dmesg`, mount it (`mount /mnt/backup`), verify the old backups with `ls /mnt/backup/dump` and the storage state with `pvesm status`.
 - **Lesson:** unmount (`umount /mnt/backup`) or shut the host down before removing a disk, and do not run `backup.yml` until `findmnt /mnt/backup` shows the disk.
 
-## 15. Grafana could not send Telegram messages (DNS "server misbehaving")
+## 14. Grafana could not send Telegram messages (DNS "server misbehaving")
 
 - **Symptom:** the contact point test failed with `lookup api.telegram.org on 127.0.0.11:53: server misbehaving`.
 - **Cause:** a container on a Compose network resolves names through Docker's embedded DNS (127.0.0.11), which forwards to the DNS of the host. This forwarding did not work from the monitoring VM, although the VM itself resolved names fine (`getent hosts api.telegram.org` worked). The MONITORING firewall rules already allowed DNS to the gateway.
 - **Fix:** give the Grafana service its own DNS server in `compose.yaml` (`dns: - 10.10.40.1`, the pfSense address of the zone) and recreate the container (`docker compose up -d`). The test message arrived.
 - **Lesson:** test name resolution from inside the container (not only from the host) and check which resolver the container actually uses.
+
+## 15. Pi-hole did not filter DNS for remote devices
+
+- **Symptom:** with the exit node selected, `nslookup doubleclick.net` returned real addresses instead of `0.0.0.0`; direct queries to the node timed out or were refused.
+- **Causes (five, found one by one):**
+  1. The Tailscale client had no exit node selected (`tailscale status` showed `offers exit-node`, not `exit node`), so DNS still went through the Wi-Fi resolver.
+  2. Pi-hole listened in the default `LOCAL` mode and silently ignored queries from Tailscale addresses (client saw a timeout). Fix: `sudo pihole-FTL --config dns.listeningMode ALL`, then restart `pihole-FTL`.
+  3. The nameserver in the Tailscale admin console pointed to a wrong, stale address (another node), so even a working Pi-hole was never asked. Tests against that address gave "connection refused".
+  4. Tailscale commands on the client need `sudo` (or `tailscale set --operator=$USER` once).
+  5. Opening the web interface: `10.10.30.20` is in the DMZ, which the VPN does not route to, so the page timed out. Fix: open it by the node name over Tailscale (`http://exit-node-vpn/admin`) instead of the address; no tunnel or firewall rule is needed.
+- **Method:** test layer by layer. First `dig @127.0.0.1` on the VM (Pi-hole itself), then a query to the node's Tailscale address from the client (network and access policy), then the client's own resolver (`resolvectl status`, `tailscale dns status`).
+- **Lesson:** check the exact address of the node with `tailscale status` or `tailscale ping` instead of trusting an old setting, and an unreachable global nameserver with *Override local DNS* breaks name resolution on the client; `tailscale down` restores the local resolver while fixing the console.

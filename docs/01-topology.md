@@ -54,7 +54,9 @@ The VM `homepage` (10.10.10.40, MGMT) shows the state of the lab on one page; se
 
 ### Exit node and DNS filter for remote users
 
-A second Tailscale node, `exit-node-vpn` (10.10.30.20, DMZ), is an exit node: remote devices can send all internet traffic through the home connection. It runs AdGuard Home (blocklist: AdGuard DNS filter), and the Tailscale admin console points the tailnet DNS at it, so remote devices get ad and tracker blocking.
+A second Tailscale node, `exit-node-vpn` (10.10.30.20, DMZ), is an exit node: remote devices can send all internet traffic through the home connection. It runs Pi-hole (blocklist: StevenBlack, about 77,000 domains), and the Tailscale admin console points the tailnet DNS at it (with *Override local DNS*), so remote devices get ad and tracker blocking while the node is used as an exit node. The web interface is reached by the node name over Tailscale (`http://exit-node-vpn/admin`), so no firewall rule is needed for it.
+
+![Pi-hole dashboard](../screenshots/pihole/dashboard.png)
 
 - The node sits in DMZ on purpose: the DMZ rules block every private network, so traffic of other people cannot reach MGMT or INFRA even if a device is compromised.
 - The node has the tag `tag:exit`. The Tailscale access policy gives a restricted user group only DNS (port 53) on that tag and the internet; the admin group has full access. The policy contains `tests` that fail the save if a restricted user could reach Proxmox, the pfSense GUI or the VPN node.

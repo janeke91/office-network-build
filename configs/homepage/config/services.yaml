@@ -44,11 +44,11 @@
         description: Firewall · 10.10.10.1
         href: https://10.10.10.1
         siteMonitor: https://10.10.10.1
-    - AdGuard:
-        icon: adguard-home.png
+    - Pi-hole:
+        icon: pi-hole.png
         description: DNS filter · 10.10.30.20
-        href: http://10.10.30.20
-        siteMonitor: http://10.10.30.20
+        href: http://exit-node-vpn/admin
+        siteMonitor: http://10.10.30.20/admin/login
     - Grafana:
         icon: grafana.png
         description: Dashboards · 10.10.40.10
