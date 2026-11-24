@@ -9,6 +9,8 @@
 | 30 | DMZ | 10.10.30.0/24 | 10.10.30.1 | none (static) |
 | 40 | MONITORING | 10.10.40.0/24 | 10.10.40.1 | none (static) |
 
+The MGMT DHCP server uses "allow known clients from only this interface", so unknown devices get no lease.
+
 ## Static hosts
 
 | Host | Zone | Address |
@@ -24,21 +26,17 @@
 | exit-node-vpn (VM 107) | DMZ | 10.10.30.20 (static, set in the VM) |
 | monitoring (VM 102) | MONITORING | 10.10.40.10 |
 
-The INFRA test VM (`test-infra`, VM 100) and the DMZ test VM (`dmz`, VM 101) used for the first rule tests were removed afterwards to free resources. INFRA is represented by the domain controller and the Windows client, DMZ by the exit node.
+The first test VMs (`test-infra`, VM 100 and `dmz`, VM 101) were removed to free resources. INFRA is now represented by the domain controller and the Windows client, DMZ by the exit node.
 
-The MGMT DHCP server uses "allow known clients from only this interface", so unknown devices do not receive a lease.
+## Proxmox network
 
-## Proxmox network configuration
-
-See [configs/proxmox/interfaces](../configs/proxmox/interfaces).
-
-Key points:
+Config: [configs/proxmox/interfaces](../configs/proxmox/interfaces).
 
 - `vmbr0` is VLAN-aware and carries VLANs 10, 20, 30, 40 on the physical port `nic0`.
-- The host address is on **`vmbr0.10`**, not on `vmbr0`. An address on `vmbr0` itself would send untagged frames, which the switch trunk places into VLAN 1.
-- VM NICs use VirtIO on `vmbr0` with the VLAN tag set per VM (10, 20, 30, 40).
-- All VMs are set to start at boot.
+- The host address is on `vmbr0.10`, not on `vmbr0`. An address on `vmbr0` sends untagged frames, and the switch trunk puts them into VLAN 1.
+- VM NICs are VirtIO on `vmbr0` with the VLAN tag set per VM.
+- All VMs start at boot.
 
-## Design note: why the switch management stays in VLAN 1
+## Why switch management stays in VLAN 1
 
-The switch is managed through port 4 (PVID 1) only. Moving its management address into a tagged VLAN risks locking the administrator out when a port profile is changed, so it was kept simple and isolated to one physical port.
+The switch is managed through port 4 (PVID 1) only. Moving its address into a tagged VLAN can lock the admin out when a port profile changes, so it stays on one isolated physical port.
