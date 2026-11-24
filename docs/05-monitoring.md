@@ -68,7 +68,7 @@ Grafana-managed alerts go to a Telegram bot. The bot token and chat ID are set i
 - All rules are in one folder and one evaluation group (every 1 minute). *Pending* avoids messages for short glitches.
 - The default notification policy sends everything to the `telegram` contact point. The message text is set in the contact point: a short English format (ALERT or RESOLVED, rule name, host, summary) instead of the long default.
 - Tested by stopping `prometheus-node-exporter` on the monitoring VM. ALERT arrived after about 3 minutes, RESOLVED after the service started again.
-- Grafana needs a DNS server that works inside the container, see [troubleshooting 14](06-troubleshooting.md).
+- Grafana needs a DNS server that works inside the container, see [troubleshooting](06-troubleshooting.md#grafana-could-not-send-telegram-messages).
 
 ## Retention and persistence
 
